@@ -1,285 +1,104 @@
 /* =====================================================
-   꾸리와뚜지 Live Archive – Global Stylesheet
-   Mobile‑first (min-width:768px overrides)
-   Palette: bg #FAFAFA | primary #E85D75 | hover #FCE8ED
-   Font: Pretendard | Icons: Lucide
+   꾸리와뚜지 Live Archive – Global Styles
+   완전 교체본 v0.1 (Mobile‑First)
    =====================================================*/
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css");
 
 :root {
-  --bg: #FAFAFA;
+  /* Brand palette */
   --primary: #E85D75;
-  --hover: #FCE8ED;
-  --text: #111;
-  --radius: 12px;
-  --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  --transition: 0.2s ease;
+  --hover:   #FCE8ED;
+  --bg:      #FAFAFA;
+  /* Misc */
+  --radius:  .5rem;
+  --shadow:  0 2px 6px rgba(0,0,0,.05);
 }
 
-/* Base Reset */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-html {
-  scroll-behavior: smooth;
-}
-body {
-  font-family: "Pretendard", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-img {
-  max-width: 100%;
-  display: block;
-}
-button {
-  border: none;
-  background: none;
-  font: inherit;
-  cursor: pointer;
-}
-a {
-  color: inherit;
-  text-decoration: none;
-}
+/* ---------------- Reset / Base ---------------- */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:'Pretendard Variable',sans-serif;background:var(--bg);color:#222;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--primary);text-decoration:none}
+button{background:none;border:none;cursor:pointer;font-family:inherit}
+input,select{font-family:inherit}
 
-/* Utility */
-.hidden {
-  display: none !important;
-}
+/* ---------------- Utility ---------------- */
+.hidden{position:absolute !important;clip:rect(0 0 0 0) !important;width:1px !important;height:1px !important;overflow:hidden !important}
 
-/* ---------------------- Hero Section ---------------------- */
-.hero {
-  text-align: center;
-  padding: 3rem 1.25rem 2rem;
-}
-.hero__title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-.hero__subtitle {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 1.5rem;
-}
+/* ---------------- Navbar ---------------- */
+.navbar{position:sticky;top:0;z-index:100;background:#fff;box-shadow:var(--shadow);padding:.75rem 1rem;display:flex;align-items:center;gap:1rem}
+.navbar__left{display:flex;align-items:center;gap:.5rem}
+.logo{width:32px;height:32px}
+.brand{font-weight:700;font-size:1rem}
+.navbar__search{flex:1;display:flex;max-width:420px;border:1px solid #ddd;border-radius:var(--radius);overflow:hidden}
+.navbar__search input{flex:1;padding:.5rem .75rem;border:0;font-size:.875rem}
+.navbar__search button{padding:0 .75rem;color:var(--primary)}
+.navbar__actions{margin-left:auto;display:flex;align-items:center;gap:.25rem}
 
-/* ---------------------- Search ---------------------- */
-.search {
-  display: flex;
-  align-items: center;
-  max-width: 480px;
-  margin: 0 auto;
-  border: 1px solid #ddd;
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: #fff;
-}
-.search__input {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: 0;
-  font-size: 1rem;
-}
-.search__input:focus {
-  outline: none;
-}
-.search__button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 1rem;
-  background: var(--primary);
-  color: #fff;
-  transition: background var(--transition);
-}
-.search__button:hover {
-  background: #d64a64;
-}
+/* ---------------- Hero ---------------- */
+.hero{max-width:960px;margin:2rem auto;text-align:center;padding:0 1rem}
+.hero__title{font-size:2rem;font-weight:800;line-height:1.25;margin:0}
+.hero__subtitle{margin-top:.5rem;color:#666}
+.badge{display:inline-block;padding:.1rem .4rem;border-radius:4px;font-size:.75rem;font-weight:600;vertical-align:middle}
+.badge--live{background:var(--primary);color:#fff}
 
-/* ---------------------- Categories ---------------------- */
-.categories {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.75rem;
-  padding: 1.5rem 1rem;
-}
-.category-card {
-  background: #fff;
-  border-radius: var(--radius);
-  padding: 0.75rem;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: background var(--transition), transform var(--transition);
-}
-.category-card:hover {
-  background: var(--hover);
-  transform: translateY(-2px);
-}
-.category-card__label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-.category-card__count {
-  font-size: 0.75rem;
-  color: var(--primary);
-}
+/* Stats */
+.stats{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;padding:0}
+.stats li{list-style:none;text-align:center}
+.stats strong{display:block;font-size:1.25rem;font-weight:700}
+.stats span{font-size:.75rem;color:#666}
 
-/* ---------------------- Recent Lives Table ---------------------- */
-.recent-lives {
-  padding: 1rem;
-}
-.section-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-.live-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.live-table th,
-.live-table td {
-  padding: 0.5rem;
-  border-bottom: 1px solid #eee;
-  text-align: left;
-}
-.live-table th {
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #666;
-}
-.live-table td img {
-  width: 96px;
-  height: 54px;
-  object-fit: cover;
-  border-radius: var(--radius);
-}
+/* ---------------- Categories ---------------- */
+.categories{max-width:960px;margin:2rem auto;display:flex;gap:.75rem;overflow-x:auto;padding:0 1rem}
+.category-card{flex:0 0 auto;min-width:88px;padding:.75rem .5rem;background:#fff;border:1px solid #eee;border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;transition:background .15s,transform .15s}
+.category-card__icon{width:28px;height:28px;margin-bottom:.5rem;color:var(--primary)}
+.category-card__label{font-size:.75rem;font-weight:500;text-align:center}
+.category-card__count{font-size:.6875rem;color:#888;margin-top:.25rem}
+.category-card:hover,.category-card:focus-visible{background:var(--hover);transform:translateY(-2px)}
 
-/* Skeleton loading row */
-@keyframes shine {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-.skeleton td {
-  height: 60px;
-  background: #f2f2f2;
-  position: relative;
-  overflow: hidden;
-}
-.skeleton td::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -200px;
-  width: 200px;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-  animation: shine 1.2s infinite;
-}
+/* ---------------- Recent Lives ---------------- */
+.recent-lives{max-width:960px;margin:0 auto;padding:0 1rem 4rem}
+.section-title{display:flex;align-items:center;gap:.25rem;font-size:1.125rem;font-weight:600;margin:1.5rem 0 .75rem}
+.count{font-weight:400;font-size:.875rem;color:var(--primary);margin-left:.25rem}
 
-/* ---------------------- Accordion ---------------------- */
-.accordion .song-list {
-  list-style: none;
-  padding: 0.5rem 0 0.75rem;
-  margin: 0;
-}
-.song-list li {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-}
-.song-list li:not(:last-child) {
-  border-bottom: 1px dashed #eee;
-}
+/* Filters */
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.75rem}
+.filters select,.button--ghost{padding:.4rem .75rem;border:1px solid #ddd;border-radius:var(--radius);background:#fff;font-size:.875rem}
+.button--ghost:hover{background:var(--hover)}
 
-/* ---------------------- Floating Calendar Button ---------------------- */
-.calendar-btn {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow);
-  z-index: 100;
-  transition: background var(--transition), transform var(--transition);
-}
-.calendar-btn:hover {
-  background: #d64a64;
-  transform: translateY(-2px);
-}
+/* Live Table */
+.live-table{width:100%;border-collapse:collapse;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.live-table thead{background:#fff;border-bottom:1px solid #eee}
+.live-table th,.live-table td{padding:.75rem .5rem;font-size:.8125rem;text-align:left}
+.live-table td:first-child{width:96px}
+.live-table tr:nth-child(even){background:#f7f7f7}
+.live-row{cursor:pointer;transition:background .15s}
+.live-row:hover{background:var(--hover)}
 
-/* ---------------------- Modal (dialog) ---------------------- */
-.modal {
-  width: min(420px, 90%);
-  border: 0;
-  border-radius: var(--radius);
-  padding: 0;
-  box-shadow: var(--shadow);
-}
-.modal::backdrop {
-  background: rgba(0, 0, 0, 0.4);
-}
-.modal__header,
-.modal__footer {
-  padding: 0.75rem 1rem;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.modal__body {
-  padding: 1rem;
-  background: #fff;
-  max-height: 60vh;
-  overflow-y: auto;
-}
-.modal__close {
-  padding: 0.25rem;
-  border-radius: 50%;
-  transition: background var(--transition);
-}
-.modal__close:hover {
-  background: var(--hover);
-}
-.button--primary {
-  padding: 0.5rem 1rem;
-  background: var(--primary);
-  color: #fff;
-  border-radius: var(--radius);
-  font-size: 0.875rem;
-  transition: background var(--transition);
-}
-.button--primary:hover {
-  background: #d64a64;
-}
+.tag{display:inline-block;background:var(--hover);color:var(--primary);padding:0 .4rem;font-size:.75rem;border-radius:4px;margin-right:.25rem}
 
-/* ---------------------- Responsive (≥768px) ---------------------- */
-@media (min-width: 768px) {
-  .hero__title {
-    font-size: 2rem;
-  }
-  .hero__subtitle {
-    font-size: 1.125rem;
-  }
-  .search {
-    max-width: 640px;
-  }
+/* Accordion */
+.accordion td{background:#fff;padding:0}
+.song-list{list-style:none;margin:0;padding:.5rem .75rem}
+.song-list li{font-size:.8125rem;padding:.25rem 0}
+
+/* ---------------- Modal ---------------- */
+.modal{border:0;border-radius:var(--radius);padding:0;max-width:320px;width:90%}
+.modal__header{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;border-bottom:1px solid #eee}
+.modal__body{max-height:60vh;overflow-y:auto;padding:1rem}
+.modal__footer{padding:.75rem 1rem;border-top:1px solid #eee;text-align:right}
+.modal__close{color:#666}
+.button--primary{background:var(--primary);color:#fff;padding:.5rem 1.25rem;border-radius:var(--radius);font-size:.875rem}
+.button--primary:hover{opacity:.9}
+
+/* ---------------- Responsive ---------------- */
+@media (min-width:768px){
+  body{font-size:16px}
+  .hero__title{font-size:2.5rem}
+  .categories{overflow-x:visible;justify-content:center}
+  .navbar{padding:1rem 2rem}
+}
+@media (min-width:1024px){
+  .live-table th,.live-table td{padding:1rem;font-size:.875rem}
+  .song-list li{font-size:.875rem}
 }

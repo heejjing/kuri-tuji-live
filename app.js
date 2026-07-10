@@ -1,6 +1,10 @@
 /* =====================================================
-   꾸리와뚜지 Live Archive – app.js (완전 교체본 v0.1)
-   모바일‑우선 구현: 라이브 목록 로드 · 검색 · 필터 · 아코디언 · 통계
+   꾸리와뚜지 Live Archive – app.js (완전 교체본 v0.2)
+   변경 사항:
+    • 방송 날짜 표기 → MM/DD/YYYY
+    • 방송 시간은 시트 텍스트 그대로
+    • 썸네일 사이즈 확대 (160×90)
+    • 통계 카드 로직 제거
    =====================================================*/
 (() => {
   /* ------------------------ 설정 ------------------------ */
@@ -16,17 +20,13 @@
   const $monthFilter   = document.getElementById('monthFilter');
   const $tagFilter     = document.getElementById('tagFilter');
   const $filtersReset  = document.getElementById('filtersReset');
-  const $resultCount   = document.getElementById('resultCount');
-  const $statLives     = document.getElementById('statLives');
-  const $statSongs     = document.getElementById('statSongs');
-  const $statViews     = document.getElementById('statViews');
-  const $statTime      = document.getElementById('statTime');
 
   const $calendarBtn   = document.getElementById('calendarBtn');
   const $calendarModal = document.getElementById('calendarModal');
   const $modalClose    = document.getElementById('modalClose');
   const $calendarApply = document.getElementById('calendarApply');
   const $calendarContainer = document.getElementById('calendarContainer');
+  const $resultCount   = document.getElementById('resultCount');
 
   /* ------------------------ 상태 ------------------------ */
   let lives = [];              // 전체 라이브 원본
@@ -55,8 +55,8 @@
       tr.dataset.liveId = live['Live ID'];
 
       tr.innerHTML = `
-        <td><img src="${makeThumb(live)}" alt="${live['제목']} 썸네일" /></td>
-        <td>${live['날짜'] || ''}</td>
+        <td><img src="${makeThumb(live)}" alt="${live['제목']} 썸네일" width="160" height="90" /></td>
+        <td>${formatDateMDY(live['날짜'])}</td>
         <td>${escapeHTML(live['제목'] || '')}</td>
         <td>${live['방송시간'] || ''}</td>
         <td>${formatTags(live['태그'])}</td>
@@ -113,22 +113,14 @@
     return clone;
   }
 
-  function updateStats() {
-    $statLives.textContent = lives.length;
-    $statSongs.textContent = lives.reduce((sum, l) => sum + (+l['노래 수'] || 0), 0);
-    // 뷰·시간 컬럼이 없다면 0 표시
-    $statViews.textContent = lives.reduce((sum, l) => sum + (+l['뷰'] || 0), 0);
-    $statTime.textContent  = formatDuration(lives.reduce((sum, l) => sum + hhmmssToSec(l['방송시간']), 0));
-  }
-
   /* =====================================================
      유틸리티
      =====================================================*/
   function makeThumb(live) {
     if (live['Asset ID']) {
-      return `https://res.cloudinary.com/soblzuny/image/upload/c_fill,h_54,w_96,g_auto/${live['Asset ID']}.jpg`;
+      return `https://res.cloudinary.com/soblzuny/image/upload/c_fill,h_90,w_160,g_auto/${live['Asset ID']}.jpg`;
     }
-    return 'https://placehold.co/96x54?text=Live';
+    return 'https://placehold.co/160x90?text=Live';
   }
 
   function formatTags(tagStr = '') {
@@ -150,17 +142,10 @@
     }[s]));
   }
 
-  function hhmmssToSec(hms = '') {
-    const parts = hms.split(':').map(Number);
-    let sec = 0;
-    if (parts.length === 3) sec = parts[0]*3600 + parts[1]*60 + parts[2];
-    else if (parts.length === 2) sec = parts[0]*60 + parts[1];
-    return sec;
-  }
-  function formatDuration(seconds) {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    return h ? `${h}시간 ${m}분` : `${m}분`;
+  function formatDateMDY(dateStr = '') {
+    if (!dateStr.includes('-')) return dateStr;
+    const [y, m, d] = dateStr.split('-');
+    return `${m}/${d}/${y}`;
   }
 
   function fillSelect(sel, opts) {
@@ -234,83 +219,3 @@
       .then(songs => {
         const acc = renderSongAccordion(liveId, songs);
         row.after(acc);
-        activeAccordion = acc;
-        updateIcons();
-      })
-      .catch(console.error);
-  }
-
-  function onSearchSubmit(e) {
-    e.preventDefault();
-    const q = $searchInput.value.trim().toLowerCase();
-    if (!q) {
-      renderLives(filteredLives.length ? filteredLives : lives);
-      return;
-    }
-    const base = filteredLives.length ? filteredLives : lives;
-    const searched = base.filter(l =>
-      ['제목', '태그', '가수'] // 가수 컬럼이 lives에 없다면 제외
-        .some(k => (l[k] || '').toLowerCase().includes(q))
-    );
-    renderLives(searched);
-  }
-
-  function onCategoryClick(e) {
-    const btn = e.target.closest('.category-card');
-    if (!btn) return;
-    $tagFilter.value = btn.dataset.tag;
-    applyFilters();
-    window.scrollTo({ top: $yearFilter.offsetTop - 60, behavior: 'smooth' });
-  }
-
-  function openCalendar() {
-    $calendarModal.showModal();
-    /* 달력 라이브러리를 로드하거나 직접 렌더링할 수 있습니다.
-       예시를 단순화하기 위해 여기서는 생략합니다. */
-  }
-  function closeCalendar() { $calendarModal.close(); }
-
-  /* =====================================================
-     초기화
-     =====================================================*/
-  async function init() {
-    try {
-      const data = await fetchJSON(`${API_BASE}?action=lives`);
-      lives = Array.isArray(data) ? data : [];
-    } catch (err) {
-      console.error(err);
-      // 오류 시 더미 한 건
-      lives = [{
-        'Live ID':'dummy1','날짜':'2026-07-01','제목':'테스트 라이브','방송시간':'1:02:34','태그':'노래 라방,커플','다시보기':'#','Asset ID':''
-      }];
-    }
-
-    filteredLives = [...lives];
-    renderLives(lives);
-    renderCategories(lives);
-    buildFilters();
-    updateStats();
-  }
-
-  /* =====================================================
-     바인딩
-     =====================================================*/
-  document.addEventListener('DOMContentLoaded', () => {
-    init();
-
-    $liveTbody.addEventListener('click', onTableClick);
-    $categories.addEventListener('click', onCategoryClick);
-    $searchForm.addEventListener('submit', onSearchSubmit);
-
-    [$yearFilter, $monthFilter, $tagFilter].forEach(sel => sel.addEventListener('change', applyFilters));
-    $filtersReset.addEventListener('click', () => {
-      $yearFilter.value = $monthFilter.value = $tagFilter.value = '';
-      applyFilters();
-    });
-
-    // 달력 모달
-    if ($calendarBtn)  $calendarBtn.addEventListener('click', openCalendar);
-    if ($modalClose)   $modalClose.addEventListener('click', closeCalendar);
-    if ($calendarApply) $calendarApply.addEventListener('click', closeCalendar);
-  });
-})();

@@ -1,105 +1,85 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>꾸리와뚜지 Live Archive</title>
-
-  <!-- Pretendard font (subset) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Main stylesheet -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>꾸리와뚜지 Live Archive</title>
+  <!-- 스타일 & 달력 CSS -->
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 <body>
-  <!-- ============= NAVBAR ============= -->
-  <nav class="navbar">
-    <div class="navbar__left">
-      <img src="assets/logo.svg" alt="꾸리와뚜지" class="logo" />
-      <span class="brand">Live Archive</span>
-    </div>
+  <!-- ===================== NAVBAR ===================== -->
+  <header>
+    <nav class="navbar">
+      <div class="navbar__left">
+        <img src="assets/logo.svg" alt="꾸리와뚜지" class="logo" />
+        <span class="brand">Live Archive</span>
+      </div>
 
-    <form id="searchForm" class="navbar__search" role="search">
-      <input id="searchInput" type="search" placeholder="검색 (라이브 / 노래 제목 / 가수)" aria-label="사이트 검색" />
-      <button aria-label="검색"><i data-lucide="search"></i></button>
-    </form>
+      <form id="searchForm" class="navbar__search" role="search">
+        <input id="searchInput" type="search" placeholder="검색 (라이브 제목 / 노래 제목 / 가수 / 태그)" aria-label="검색" />
+        <button aria-label="검색"><i data-lucide="search"></i></button>
+      </form>
 
-    <div class="navbar__actions">
-      <button id="calendarBtn" aria-label="달력 열기"><i data-lucide="calendar"></i></button>
-      <button id="toggleList" aria-label="리스트 모드"><i data-lucide="list"></i></button>
-      <button aria-label="공유"><i data-lucide="share-2"></i></button>
-    </div>
-  </nav>
-
-  <!-- ============= HERO ============= -->
-  <header class="hero">
-    <h1 class="hero__title">
-      꾸리와뚜지<br />
-      <span>라이브 아카이브</span>
-      <span class="badge badge--live">LIVE</span>
-    </h1>
-    <p class="hero__subtitle">지난 라이브 방송을 쉽고 빠르게 찾아보세요</p>
-
-    <ul class="stats">
-      <li><strong id="statLives">0</strong><span>총 라이브</span></li>
-      <li><strong id="statSongs">0</strong><span>방송 노래</span></li>
-      <li><strong id="statViews">0</strong><span>뷰가 노출</span></li>
-      <li><strong id="statTime">0</strong><span>함께한 시간</span></li>
-    </ul>
+      <div class="navbar__actions">
+        <button id="calendarBtn" aria-label="달력"><i data-lucide="calendar"></i></button>
+        <button id="toggleList" aria-label="리스트 보기"><i data-lucide="list"></i></button>
+        <button aria-label="공유"><i data-lucide="share-2"></i></button>
+      </div>
+    </nav>
   </header>
 
-  <!-- ============= CATEGORIES ============= -->
-  <section class="categories" id="categories">
-    <!-- 템플릿 카드는 JS에서 복제/삽입 -->
-    <button class="category-card" data-tag="노래 라방">
-      <i data-lucide="music" class="category-card__icon"></i>
-      <span class="category-card__label">노래 라방 모아보기</span>
-      <span class="category-card__count">0</span>
-    </button>
-  </section>
+  <!-- ===================== HERO ===================== -->
+  <main>
+    <section class="hero">
+      <h1 class="hero__title">
+        꾸리와뚜지<br /><span>라이브 아카이브</span>
+        <span class="badge badge--live">LIVE</span>
+      </h1>
+      <p class="hero__subtitle">지난 라이브 방송을 쉽고 빠르게 찾아보세요</p>
+    </section>
 
-  <!-- ============= LIVE LIST ============= -->
-  <section class="recent-lives">
-    <h2 class="section-title"><i data-lucide="mic"></i> 노래 라방 모아보기 <span id="resultCount" class="count">(0)</span></h2>
+    <!-- ===================== CATEGORY CARDS ===================== -->
+    <section class="categories" id="categories">
+      <!-- 템플릿 카드 (JS가 복제) -->
+      <button class="category-card" data-tag="노래 라방">
+        <i data-lucide="music" class="category-card__icon"></i>
+        <span class="category-card__label">노래 라방 모아보기</span>
+        <span class="category-card__count">0</span>
+      </button>
+    </section>
 
-    <!-- FILTER BAR -->
-    <div class="filters">
-      <select id="yearFilter" aria-label="연도 필터"></select>
-      <select id="monthFilter" aria-label="월 필터"></select>
-      <select id="tagFilter" aria-label="태그 필터"></select>
-      <button id="filtersReset" class="button--ghost" aria-label="필터 초기화">필터 초기화</button>
-    </div>
+    <!-- ===================== LIVE LIST ===================== -->
+    <section class="recent-lives">
+      <h2 class="section-title"><i data-lucide="mic"></i> 노래 라방 모아보기 <span id="resultCount" class="count">(0)</span></h2>
 
-    <!-- LIVE TABLE -->
-    <div class="table-wrapper">
+      <div class="filters">
+        <select id="yearFilter" aria-label="연도 필터"></select>
+        <select id="monthFilter" aria-label="월 필터"></select>
+        <select id="tagFilter" aria-label="태그 필터"></select>
+        <button id="filtersReset" class="button--ghost">필터 초기화</button>
+      </div>
+
       <table class="live-table">
         <thead>
           <tr>
-            <th scope="col">썸네일</th>
-            <th scope="col">방송 날짜</th>
-            <th scope="col">라이브 제목</th>
-            <th scope="col">방송 시간</th>
-            <th scope="col">태그</th>
-            <th scope="col">다시보기</th>
+            <th>썸네일</th><th>방송 날짜</th><th>라이브 제목</th><th>방송 시간</th><th>태그</th><th>다시보기</th>
           </tr>
         </thead>
         <tbody id="liveTbody"></tbody>
       </table>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- ============= SONG ACCORDION TEMPLATE ============= -->
+  <!-- ===================== SONG ACCORDION TEMPLATE ===================== -->
   <template id="songAccordionTemplate">
-    <tr class="accordion">
-      <td colspan="6">
-        <ul class="song-list"></ul>
-      </td>
-    </tr>
+    <tr class="accordion"><td colspan="6"><ul class="song-list"></ul></td></tr>
   </template>
 
-  <!-- ============= CALENDAR MODAL ============= -->
+  <!-- ===================== CALENDAR MODAL ===================== -->
   <dialog id="calendarModal" class="modal">
     <div class="modal__header">
       <h3>방송일 선택</h3>
@@ -111,8 +91,7 @@
     </div>
   </dialog>
 
-  <!-- ============= SCRIPTS ============= -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- ===================== MAIN SCRIPT ===================== -->
   <script src="app.js" defer></script>
 </body>
 </html>

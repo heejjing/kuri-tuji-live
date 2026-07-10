@@ -1,328 +1,3 @@
-
-
-app.js 파일을 캔버스에 추가했습니다.
-
-기본 데이터 로드·검색·카테고리·아코디언(노래 목록)·달력 모달 열기까지 동작하도록 초기 구현을 넣었어요.
-
-Google Apps Script API가 준비돼 있다면 URL만 그대로 사용하면 되고, 아직이면 더미 데이터가 표시됩니다.
-
-확인해 보시고 수정‧추가 요청 주세요!
-
-
-App
-ChatGPT Image 2026년 7월 9일 오후 09_16_05.png
-이미지처럼 이런식으로 구현하고 싶거든
-
-이미지와 현재 스펙을 나란히 보면서 index.html → style.css → app.js 순으로 필요한 핵심 구조·스타일·스크립트를 정리했습니다.
-아래 코드는 “완전 교체용”이 아니라 추가·수정이 필요한 부분만 추려 넣었으니,
-GitHub 웹 UI에서 열어 두신 파일에 해당 블록만 붙여 넣거나 교체해 주세요.
-(모든 파일을 새로 덮어쓰고 싶다면 말씀만 주세요!)
-
-1⃣ index.html ― 레이아웃 & 컴포넌트 확장
-<!-- ① 최상단 내비게이션 : <header> 바로 안쪽 -->
-<nav class="navbar">
-  <div class="navbar__left">
-    <img src="assets/logo.svg" alt="꾸리와뚜지" class="logo" />
-    <span class="brand">Live Archive</span>
-  </div>
-
-  <form id="searchForm" class="navbar__search">
-    <input id="searchInput" type="search" placeholder="검색 (라이브 / 노래 제목 / 가수)" />
-    <button aria-label="Search"><i data-lucide="search"></i></button>
-  </form>
-
-  <div class="navbar__actions">
-    <button aria-label="달력" id="calendarBtn"><i data-lucide="calendar"></i></button>
-    <button aria-label="목록 모드" id="toggleList"><i data-lucide="list"></i></button>
-    <button aria-label="공유하기"><i data-lucide="share-2"></i></button>
-  </div>
-</nav>
-
-<!-- ② Hero + 통계 카드 -->
-<section class="hero">
-  <h1 class="hero__title">꾸리와뚜지<br /><span>라이브 아카이브</span> <span class="badge badge--live">LIVE</span></h1>
-  <p class="hero__subtitle">지난 라이브 방송을 쉽고 빠르게 찾아보세요</p>
-
-  <ul class="stats">
-    <!-- 숫자는 JS에서 동적으로 치환 -->
-    <li><strong id="statLives">0</strong><span>총 라이브</span></li>
-    <li><strong id="statSongs">0</strong><span>방송 노래</span></li>
-    <li><strong id="statViews">0</strong><span>뷰가 노출</span></li>
-    <li><strong id="statTime">0</strong><span>함께한 시간</span></li>
-  </ul>
-</section>
-
-<!-- ③ 카테고리 카드 영역 -->
-<section class="categories" id="categories">
-  <!-- 템플릿 카드 : JS가 복제해 채웁니다 -->
-  <button class="category-card" data-tag="노래 라방">
-    <i data-lucide="music" class="category-card__icon"></i>
-    <span class="category-card__label">노래 라방 모아보기</span>
-    <span class="category-card__count">0</span>
-  </button>
-  <!-- … JS가 추가 생성 -->
-</section>
-
-<!-- ④ 필터 바 + 라이브 리스트 -->
-<section class="recent-lives">
-  <h2 class="section-title"><i data-lucide="mic"></i> 노래 라방 모아보기 <span id="resultCount" class="count">(0)</span></h2>
-
-  <!-- 필터 바 -->
-  <div class="filters">
-    <select id="yearFilter"></select>
-    <select id="monthFilter"></select>
-    <select id="tagFilter"></select>
-    <button id="filtersReset" class="button--ghost">필터 초기화</button>
-  </div>
-
-  <!-- 리스트 테이블 -->
-  <table class="live-table">
-    <thead>
-      <tr><th>썸네일</th><th>방송 날짜</th><th>라이브 제목</th><th>방송 시간</th><th>태그</th><th>다시보기</th></tr>
-    </thead>
-    <tbody id="liveTbody"></tbody>
-  </table>
-</section>
-
-<!-- ⑤ 아코디언 노래 목록 템플릿 (숨김) -->
-<template id="songAccordionTemplate">
-  <tr class="accordion">
-    <td colspan="6">
-      <ul class="song-list"></ul>
-    </td>
-  </tr>
-</template>
-
-<!-- ⑥ 달력 모달 -->
-<dialog id="calendarModal" class="modal">
-  <div class="modal__header">
-    <h3>방송일 선택</h3>
-    <button id="modalClose" class="modal__close"><i data-lucide="x"></i></button>
-  </div>
-  <div id="calendarContainer" class="modal__body"></div>
-  <div class="modal__footer">
-    <button id="calendarApply" class="button--primary">적용</button>
-  </div>
-</dialog>
-
-<!-- ⑦ Lucide & main JS -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="app.js" defer></script>
-파일 구조
-
-/public
-  ├── assets/logo.svg
-  ├── index.html
-  ├── style.css
-  └── app.js
-2⃣ style.css ― 새 요소·컴포넌트 스타일 덧입히기
-style.css 최하단에 추가 (기존 코드 아래 붙여넣기)
-
-/* ---------------------- Navbar ---------------------- */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background: #fff;
-  box-shadow: var(--shadow);
-}
-.navbar__left { display: flex; align-items: center; gap: 0.5rem; }
-.logo { width: 32px; height: 32px; }
-.brand { font-weight: 700; font-size: 1rem; }
-.navbar__search {
-  flex: 1;
-  max-width: 420px;
-  display: flex;
-  border: 1px solid #eee;
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.navbar__search input {
-  flex: 1; padding: 0.5rem 0.75rem; border: 0;
-}
-.navbar__search button { padding: 0 0.75rem; color: var(--primary); }
-.navbar__actions button { margin-left: 0.5rem; }
-
-/* ---------------------- Hero Stats ---------------------- */
-.stats {
-  display: flex;
-  gap: 1.25rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 1.5rem;
-}
-.stats li { text-align: center; }
-.stats strong { font-size: 1.25rem; display: block; }
-.badge--live {
-  background: var(--primary); color: #fff; font-size: 0.75rem;
-  padding: 0.1rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;
-}
-
-/* ---------------------- Filters Bar ---------------------- */
-.filters {
-  display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;
-  margin-bottom: 0.75rem;
-}
-.filters select, .button--ghost {
-  padding: 0.4rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: var(--radius);
-  background: #fff;
-  font-size: 0.875rem;
-}
-.button--ghost:hover { background: var(--hover); }
-.count { font-size: 0.875rem; color: var(--primary); margin-left: 0.25rem; }
-3⃣ app.js ― 통계·필터 드롭다운·카운트 연동
-추가 / 수정해야 할 주요 함수 (코드 위치는 기존 init 아래 등 적절한 곳)
-
-/* ---------- 카운트 & 통계 ---------- */
-function updateStats() {
-  document.getElementById('statLives').textContent = lives.length;
-  // 노래·시간·뷰 등은 API에 컬럼이 있으면 합산, 없으면 나중에 계산
-  document.getElementById('statSongs').textContent =
-    lives.reduce((acc, l) => acc + (+l['노래 수'] || 0), 0);
-}
-
-/* ---------- 필터 select 채우기 ---------- */
-function buildFilters() {
-  const years = new Set(), months = new Set(), tags = new Set();
-
-  lives.forEach(l => {
-    if (l['날짜']) {
-      const [y, m] = l['날짜'].split('-');
-      years.add(y); months.add(m);
-    }
-    (l['태그'] || '').split(',').forEach(t => tags.add(t.trim()));
-  });
-
-  fillSelect(yearFilter, [...years].sort().reverse());
-  fillSelect(monthFilter, [...months].sort());
-  fillSelect(tagFilter, [...tags].filter(Boolean).sort());
-}
-
-function fillSelect(select, options) {
-  select.innerHTML = '<option value="">전체</option>' +
-    options.map(v => `<option value="${v}">${v}</option>`).join('');
-}
-
-/* ---------- 필터 적용 ---------- */
-function applyFilters() {
-  const y = yearFilter.value, m = monthFilter.value, t = tagFilter.value;
-  const filtered = lives.filter(l => {
-    const [yy, mm] = l['날짜'].split('-');
-    return (!y || yy === y) && (!m || mm === m) &&
-           (!t || (l['태그']||'').includes(t));
-  });
-  renderLives(filtered);
-  document.getElementById('resultCount').textContent = `(${filtered.length})`;
-}
-
-/* ---------- 기존 init() 안쪽에 호출 추가 ---------- */
-buildFilters();
-updateStats();
-그리고 이벤트 바인딩 추가:
-
-yearFilter.addEventListener('change', applyFilters);
-monthFilter.addEventListener('change', applyFilters);
-tagFilter.addEventListener('change', applyFilters);
-filtersReset.addEventListener('click', () => {
-  yearFilter.value = monthFilter.value = tagFilter.value = '';
-  applyFilters();
-});
-⏭️ 다음 단계
-index.html · style.css · app.js 를 위 내용대로 반영해 커밋하면 Vercel이 자동 배포합니다.
-
-Cloudinary 썸네일·통계(총 시간, 뷰)는 API 응답에 해당 데이터 컬럼이 있어야 제대로 표시되니, 스프레드시트 구조를 확인해 주세요.
-
-달력 모달은 Day.js + Vanillajs-Calendar 등 가벼운 달력 라이브러리를 붙일지, 순수 JS로 구성할지 결정 후 <calendarContainer> 내부를 채우면 됩니다.
-
-필요한 부분이 덜 구현됐거나 추가 디자인 조정이 필요하면 언제든 말씀해 주세요!
-
-
-캔버스에 완전 교체용으로 다시 써줘 
-
-index.html를 새로운 전체 버전으로 캔버스에 올려두었습니다.
-(기존 코드는 모두 덮어쓴 완전 교체본이니, 필요하면 확인 후 GitHub에 그대로 업로드하세요.)
-
-다음 차례로 style.css → app.js도 같은 방식으로 “완전 교체본”을 준비할까요, 아니면 특정 부분부터 수정할까요?
-
-
-다음 차례로 완전 교체본 준비
-
-
-
-
-Index
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -392,3 +67,52 @@ Index
     <!-- FILTER BAR -->
     <div class="filters">
       <select id="yearFilter" aria-label="연도 필터"></select>
+      <select id="monthFilter" aria-label="월 필터"></select>
+      <select id="tagFilter" aria-label="태그 필터"></select>
+      <button id="filtersReset" class="button--ghost" aria-label="필터 초기화">필터 초기화</button>
+    </div>
+
+    <!-- LIVE TABLE -->
+    <div class="table-wrapper">
+      <table class="live-table">
+        <thead>
+          <tr>
+            <th scope="col">썸네일</th>
+            <th scope="col">방송 날짜</th>
+            <th scope="col">라이브 제목</th>
+            <th scope="col">방송 시간</th>
+            <th scope="col">태그</th>
+            <th scope="col">다시보기</th>
+          </tr>
+        </thead>
+        <tbody id="liveTbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============= SONG ACCORDION TEMPLATE ============= -->
+  <template id="songAccordionTemplate">
+    <tr class="accordion">
+      <td colspan="6">
+        <ul class="song-list"></ul>
+      </td>
+    </tr>
+  </template>
+
+  <!-- ============= CALENDAR MODAL ============= -->
+  <dialog id="calendarModal" class="modal">
+    <div class="modal__header">
+      <h3>방송일 선택</h3>
+      <button id="modalClose" class="modal__close" aria-label="닫기"><i data-lucide="x"></i></button>
+    </div>
+    <div id="calendarContainer" class="modal__body"></div>
+    <div class="modal__footer">
+      <button id="calendarApply" class="button--primary">적용</button>
+    </div>
+  </dialog>
+
+  <!-- ============= SCRIPTS ============= -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>

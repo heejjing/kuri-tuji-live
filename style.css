@@ -1,0 +1,285 @@
+/* =====================================================
+   꾸리와뚜지 Live Archive – Global Stylesheet
+   Mobile‑first (min-width:768px overrides)
+   Palette: bg #FAFAFA | primary #E85D75 | hover #FCE8ED
+   Font: Pretendard | Icons: Lucide
+   =====================================================*/
+
+:root {
+  --bg: #FAFAFA;
+  --primary: #E85D75;
+  --hover: #FCE8ED;
+  --text: #111;
+  --radius: 12px;
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --transition: 0.2s ease;
+}
+
+/* Base Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: "Pretendard", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+button {
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
+/* ---------------------- Hero Section ---------------------- */
+.hero {
+  text-align: center;
+  padding: 3rem 1.25rem 2rem;
+}
+.hero__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.hero__subtitle {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------------------- Search ---------------------- */
+.search {
+  display: flex;
+  align-items: center;
+  max-width: 480px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+}
+.search__input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 0;
+  font-size: 1rem;
+}
+.search__input:focus {
+  outline: none;
+}
+.search__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  background: var(--primary);
+  color: #fff;
+  transition: background var(--transition);
+}
+.search__button:hover {
+  background: #d64a64;
+}
+
+/* ---------------------- Categories ---------------------- */
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
+}
+.category-card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: background var(--transition), transform var(--transition);
+}
+.category-card:hover {
+  background: var(--hover);
+  transform: translateY(-2px);
+}
+.category-card__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.category-card__count {
+  font-size: 0.75rem;
+  color: var(--primary);
+}
+
+/* ---------------------- Recent Lives Table ---------------------- */
+.recent-lives {
+  padding: 1rem;
+}
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.live-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.live-table th,
+.live-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+.live-table th {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #666;
+}
+.live-table td img {
+  width: 96px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* Skeleton loading row */
+@keyframes shine {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+.skeleton td {
+  height: 60px;
+  background: #f2f2f2;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton td::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -200px;
+  width: 200px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: shine 1.2s infinite;
+}
+
+/* ---------------------- Accordion ---------------------- */
+.accordion .song-list {
+  list-style: none;
+  padding: 0.5rem 0 0.75rem;
+  margin: 0;
+}
+.song-list li {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+.song-list li:not(:last-child) {
+  border-bottom: 1px dashed #eee;
+}
+
+/* ---------------------- Floating Calendar Button ---------------------- */
+.calendar-btn {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  z-index: 100;
+  transition: background var(--transition), transform var(--transition);
+}
+.calendar-btn:hover {
+  background: #d64a64;
+  transform: translateY(-2px);
+}
+
+/* ---------------------- Modal (dialog) ---------------------- */
+.modal {
+  width: min(420px, 90%);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0;
+  box-shadow: var(--shadow);
+}
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+.modal__header,
+.modal__footer {
+  padding: 0.75rem 1rem;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal__body {
+  padding: 1rem;
+  background: #fff;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.modal__close {
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: background var(--transition);
+}
+.modal__close:hover {
+  background: var(--hover);
+}
+.button--primary {
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  transition: background var(--transition);
+}
+.button--primary:hover {
+  background: #d64a64;
+}
+
+/* ---------------------- Responsive (≥768px) ---------------------- */
+@media (min-width: 768px) {
+  .hero__title {
+    font-size: 2rem;
+  }
+  .hero__subtitle {
+    font-size: 1.125rem;
+  }
+  .search {
+    max-width: 640px;
+  }
+}

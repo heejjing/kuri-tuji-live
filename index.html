@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>꾸리와뚜지 Live Archive</title>
+
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+
+  <!-- Icons -->
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Hero Section -->
+    <header class="hero" id="hero">
+      <h1 class="hero__title">꾸리와뚜지 Live Archive</h1>
+      <p class="hero__subtitle">지난 라이브 방송과 노래 정보를 한눈에!</p>
+
+      <!-- Search -->
+      <form id="searchForm" class="search" role="search">
+        <input type="search" id="searchInput" class="search__input" placeholder="라이브 제목, 노래, 가수 검색…" aria-label="통합 검색" />
+        <button type="submit" class="search__button" aria-label="검색">
+          <i data-lucide="search"></i>
+        </button>
+      </form>
+    </header>
+
+    <!-- Category Cards -->
+    <section id="categories" class="categories" aria-label="카테고리">
+      <!-- Example category card -->
+      <button class="category-card" data-tag="노래라방">
+        <span class="category-card__label">노래 라방</span>
+        <span class="category-card__count" id="tag-count-노래라방">0</span>
+      </button>
+      <!-- Additional cards will be injected dynamically in app.js -->
+    </section>
+
+    <!-- Recent Lives -->
+    <section id="recentLives" class="recent-lives">
+      <h2 class="section-title">최근 추가된 라이브</h2>
+      <table class="live-table" aria-label="라이브 목록">
+        <thead>
+          <tr>
+            <th scope="col">썸네일</th>
+            <th scope="col">날짜</th>
+            <th scope="col">제목</th>
+            <th scope="col">방송시간</th>
+            <th scope="col">태그</th>
+            <th scope="col">다시보기</th>
+          </tr>
+        </thead>
+        <tbody id="liveTbody">
+          <!-- Skeleton placeholder row -->
+          <tr class="skeleton">
+            <td colspan="6"></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Calendar Filter Button -->
+    <button id="calendarBtn" class="calendar-btn" aria-label="달력 필터 열기">
+      <i data-lucide="calendar"></i>
+    </button>
+
+    <!-- Calendar Modal -->
+    <dialog id="calendarModal" class="modal" aria-labelledby="calendarTitle">
+      <div class="modal__header">
+        <h3 id="calendarTitle">날짜 선택</h3>
+        <button id="modalClose" class="modal__close" aria-label="닫기">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal__body" id="calendarContainer">
+        <!-- Calendar will be rendered here by JS -->
+      </div>
+      <div class="modal__footer">
+        <button id="calendarApply" class="button--primary">적용</button>
+      </div>
+    </dialog>
+
+    <!-- Accordion Template (hidden) -->
+    <template id="songAccordionTemplate">
+      <tr class="accordion" data-live-id="">
+        <td colspan="6">
+          <ul class="song-list"></ul>
+        </td>
+      </tr>
+    </template>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js" defer></script>
+</body>
+</html>
